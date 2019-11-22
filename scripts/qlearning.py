@@ -11,6 +11,9 @@ import numpy as np
 import random
 import environment_api as api
 from matplotlib import pyplot as plt
+import pdb
+
+from Agent import Agent
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-task', help="Task to execute:\n1. Q learning on sample trajectories\n2. Q learning without pruned actions\n3. Q learning with pruned actions", metavar='1', action='store', dest='task', default="1", type=int)
@@ -52,6 +55,97 @@ class QLearning:
         q_values = {}
         
         # Your code here
+        
+        
+        actions_json_file='/action_config.json'
+
+        with open(self.root_path + actions_json_file) as json_file:
+            try:
+                action_reference = json.load(json_file, parse_float=float)
+            except (ValueError, KeyError, TypeError):
+                print "JSON error"
+        
+        
+        
+        
+        episodes=300
+        episode_update=5 #the amount of episodes a tbot will train while the other tbots policy remains constant. must be a divisor of episodes
+        
+        
+        epsilon_initial=.95
+        epsilon_decay=.02
+        epsilon_calc= lambda epsilon_initial,epsilon_decay,i: max(0.05, epsilon_initial - epsilon_decay*i) 
+        
+        
+        
+        pdb.set_trace()
+        
+        #q tables initialized to zero 
+        q1=np.zeros((4,4,2,2,4,5)) #(x,y,c1,c2,tbot_near,action) #c1,c2 will be zero if available, and one if picked up 
+        q2=np.zeros((4,4,2,2,4,5))
+
+        agent1=Agent('robot1',q1) 
+        agent2=Agent('robot2',q2)
+        
+        tbot_list=[agent1,agent2]
+        initial_state=api.get_current_state()
+        
+        
+        
+        
+        for i in range(int(episodes/episode_update)):
+          epsilon=epsilon_calc(epsilon_initial,epsilon_decay,i)
+          for tbot in tbot_list:
+            for e in range(episode_update):
+              #pick action
+              #choose either random or exploit, according to epsilon=epsilon_calc(epsilon_initial, epsilon_decay, i)
+              
+              if epsilon>np.random.uniform(): #if this, do random
+                  action_string=random.choice(api.get_all_actions())
+                  
+              else:
+                  action_idx=tbot.q[state].argmax()
+                  action_string=tbot.idx_to_action(action_idx)
+                  
+              action_split=action_string.split()
+              action=action_split[0]
+              action_items=action_split[1:]
+                
+              action_params={}
+              for i,item in enumerate(action_reference[action]['params']):
+                  action_params[str(item)]=action_items[i]
+              
+              success,next_state=api.execute_action(action,action_params,tbot.name)
+              
+              #print("tbot reward key is " + str(tbot.reward_key))
+              #get reward
+              reward=get_reward(action,tbot,tbot_list)
+              #get_reward(tbot
+              
+              #update q_values of ONLY tbot
+              tbot.q[tuple(state)+tuple(action)]=(1-self.alpha)*tbot.q[tuple(state)+tuple(action)]+self.alpha*(reward+self.gamma*max(tbot.q[next_state]))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         return q_values
 
