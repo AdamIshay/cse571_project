@@ -58,7 +58,7 @@ class Agent:
         tbot_near=self.tbot_near([rx,ry],[rx_other,ry_other])
         
         
-        pdb.set_trace()
+        #pdb.set_trace()
         
         state=(rx,ry,ro,c1_idx,c2_idx,tbot_near)
         #      x, y , coin,  other coin, tbot_near 
