@@ -12,7 +12,7 @@ import random
 import environment_api as api
 from matplotlib import pyplot as plt
 import pdb
-
+import re
 from Agent import Agent
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -49,7 +49,51 @@ class QLearning:
         with open(root_path + "/q_values.json", "w") as fout:
             json.dump(q_values, fout)
 
+    def reward_prune(self,current_state,state_active,state_passive,action,action_items,tbot,tbot_other):
+        #function that chooses to prune invalid actions (with large negative reward and no state change) or go through the api 
+        through_api=True
+        next_state=None
+        reward=None
+        
+        if action!='moveF' and action!='pick':
+            return through_api,next_state,reward
+        
+        if action=='pick':
+            book_number=int(re.findall(r'\d+', action_items[0])[0])
+            if book_number not in tbot.books:
+                reward=self.book_penalty
+                through_api=False
+                next_state=current_state.copy()
 
+        if action=='moveF':
+            tbot_near=tbot.tbot_near(state_active,state_passive)
+            if tbot_near==state_active[2]: #if another tbot is in the same direction that tbot_active is facing
+                reward=self.bump_penalty
+                through_api=False
+                next_state=current_state.copy()
+                
+
+        return through_api,next_state,reward
+    
+    def choose_action(self, tbot,epsilon,state):
+        if epsilon>np.random.uniform(): #if this, do random
+            action_string=random.choice(api.get_all_actions())
+            
+        else:
+            action_idx=tbot.q[state].argmax()
+            action_string=tbot.idx_to_action(action_idx)
+            
+        action_split=action_string.split()
+        action=action_split[0]
+        action_items=action_split[1:]
+        
+        action_params={}
+        for i,item in enumerate(self.action_reference[action]['params']):
+            action_params[str(item)]=action_items[i]
+        
+        return action,action_items,action_params
+    
+    
     def task3(self, episodes):
         
         q_values = {}
@@ -61,7 +105,7 @@ class QLearning:
 
         with open(self.root_path + actions_json_file) as json_file:
             try:
-                action_reference = json.load(json_file, parse_float=float)
+                self.action_reference = json.load(json_file, parse_float=float)
             except (ValueError, KeyError, TypeError):
                 print "JSON error"
         
@@ -76,67 +120,90 @@ class QLearning:
         epsilon_decay=.02
         epsilon_calc= lambda epsilon_initial,epsilon_decay,i: max(0.05, epsilon_initial - epsilon_decay*i) 
         
-        
+        self.book_penalty=-100
+        self.bump_penalty=-100
         
         pdb.set_trace()
         
         #q tables initialized to zero 
-        q1=np.zeros((4,4,2,2,4,5)) #(x,y,c1,c2,tbot_near,action) #c1,c2 will be zero if available, and one if picked up 
-        q2=np.zeros((4,4,2,2,4,5))
-
-        agent1=Agent('robot1',q1) 
-        agent2=Agent('robot2',q2)
+        q1=np.zeros((4,4,4,2,2,4,5)) #(x,y, orientation, c1,c2,tbot_near,action) #c1,c2 will be zero if available, and one if picked up 
+        q2=np.zeros((4,4,4,2,2,4,5))
+        
+        agent1_books=[1]
+        agent2_books=[2]
+        
+        
+        agent1=Agent('robot1',q1,agent1_books) 
+        agent2=Agent('robot2',q2,agent2_books)
         
         tbot_list=[agent1,agent2]
-        initial_state=api.get_current_state()
         
         
+        episode_block=int(episodes/episode_update)
         
-        
-        for i in range(int(episodes/episode_update)):
+        for i in range(episode_block):
           epsilon=epsilon_calc(epsilon_initial,epsilon_decay,i)
-          for tbot in tbot_list:
-            for e in range(episode_update):
-              #pick action
-              #choose either random or exploit, according to epsilon=epsilon_calc(epsilon_initial, epsilon_decay, i)
+          for tbot in tbot_list: #determines which tbot is learning, active updates table, passive does not
+            tbot_active=tbot
+            tbot_passive_set=set(tbot_list)-set([tbot])
+            tbot_passive=tbot_passive_set.pop()
+            for e in range(episode_update):#cycle through the episodes inside an episode block
+              api.reset_world()
+              initial_state=api.get_current_state()
+              current_state=initial_state
               
-              if epsilon>np.random.uniform(): #if this, do random
-                  action_string=random.choice(api.get_all_actions())
-                  
-              else:
-                  action_idx=tbot.q[state].argmax()
-                  action_string=tbot.idx_to_action(action_idx)
-                  
-              action_split=action_string.split()
-              action=action_split[0]
-              action_items=action_split[1:]
+              state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
+              state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
+              
+              while not api.is_terminal_state(current_state):
                 
-              action_params={}
-              for i,item in enumerate(action_reference[action]['params']):
-                  action_params[str(item)]=action_items[i]
-              
-              success,next_state=api.execute_action(action,action_params,tbot.name)
-              
-              #print("tbot reward key is " + str(tbot.reward_key))
-              #get reward
-              reward=get_reward(action,tbot,tbot_list)
-              #get_reward(tbot
-              
-              #update q_values of ONLY tbot
-              tbot.q[tuple(state)+tuple(action)]=(1-self.alpha)*tbot.q[tuple(state)+tuple(action)]+self.alpha*(reward+self.gamma*max(tbot.q[next_state]))
+                through_api=True # flag for going through API for an action, if False, then reward is given manually
+
+
+                #pick action for tbot_active
+                #choose either random or exploit, according to epsilon=epsilon_calc(epsilon_initial, epsilon_decay, i)
+                
+
+                action_A,action_items_A,action_params_A=self.choose_action(tbot_active,epsilon,current_state)
+                
+                pdb.set_trace()
+                
+                
+                through_api,next_state,reward=self.reward_prune(current_state,state_active,state_passive,action_A,action_items_A,tbot_active,tbot_passive)
+                
+                if through_api:
+                  success,next_state=api.execute_action(action_A,action_params_A,tbot_active.name)
+                  reward=api.get_reward(current_state,action_A,next_state)
+                
+                next_state_active=tbot_active.dict_to_np_state(next_state,tbot_passive)
+                
+                
+                #update q_values of tbot_active ONLY
+                pdb.set_trace()
+                
+                state_action_idx=tuple(state_active)+tuple(tbot_active.idx_to_action.index(action_A))
+                tbot_active.q[state_action_idx]=(1-self.alpha)*tbot_active.q[state_action_idx]+self.alpha*(reward+self.gamma*max(tbot_active.q[next_state_active]))
+                
+                
+                
+                current_state=next_state # udpate current state for other tbot
+                
+                state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
+                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
         
         
         
+                action_P,action_items_P,action_params_P=self.choose_action(tbot_passive,epsilon,current_state)
+        
+                through_api,next_state,reward=self.reward_prune(current_state,state_active,state_passive,action_A,action_items_A,tbot_active,tbot_passive) #reward won't be used 
+                
         
         
         
-        
-        
-        
-        
-        
-        
-        
+                current_state=next_state # udpate current state for active tbot
+                
+                state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
+                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
         
         
         
@@ -173,7 +240,3 @@ if __name__ == "__main__":
         QLearning(args.task, headless=args.headless, sample=args.sample)
     elif args.task == 2 or args.task == 3:
         QLearning(args.task, headless=args.headless, episodes=args.episodes)
-
-
-
-    

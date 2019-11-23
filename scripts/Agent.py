@@ -14,12 +14,12 @@ import pdb
 #q table is (x,y,c1,c2,tbot_near,num_actions)
 
 class Agent:
-    def __init__(self,name,q):
+    def __init__(self,name,q,books):
         
         self.name=name
         self.q=q
-        
-        self.c=0
+        self.books=books
+        self.c=0 # 0 means that the coin is not picked up 
         
         #self.reward_key=reward_key
         #self.reward_locs=grid_rewards
@@ -30,14 +30,18 @@ class Agent:
         self.idx_to_action=['moveF', 'TurnCW', 'TurnCCW', 'pick book_1', 'pick book_2']
         
         
-    def dict_to_np(self,d,other_bot):
         
+    def dict_to_np_state(self,d,other_bot):
+        #returns state index for numpy array q table 
         c1x=d['book_1']['x']
         c1y=d['book_1']['y']
+        c1_placed=d['book_1']['placed']
+        c1_idx=int(c1_placed)
         
         c2x=d['book_2']['x']
         c2y=d['book_2']['y']
-        
+        c2_placed=d['book_2']['placed']
+        c2_idx=int(c2_placed)
         
         rx=self.pos_to_idx(d[self.name]['x'])
         ry=self.pos_to_idx(d[self.name]['y'])
@@ -53,14 +57,18 @@ class Agent:
         
         tbot_near=self.tbot_near([rx,ry],[rx_other,ry_other])
         
+        
         pdb.set_trace()
         
-        
-        state=(rx,ry,self.c,other_bot.c,tbot_near)
-        
+        state=(rx,ry,ro,c1_idx,c2_idx,tbot_near)
+        #      x, y , coin,  other coin, tbot_near 
+        return state 
         
     def tbot_near(self,r1,r2):
-        pdb.set_trace()
+        #r1=[r1x,r1y] etc. robot x-y coordinates 
+        #0,1,2,3 means that another tbot is above, to the right, below, or to the left
+        #4 means that there is no bot near 
+        #pdb.set_trace()
         if abs(r1[0]-r2[0])+abs(r1[1]-r2[1])==1:
             if r1[1]>r2[1]:
                 return 2
@@ -72,7 +80,7 @@ class Agent:
                 return 1
             
         else:
-            return 5
+            return 4
             
             
         
