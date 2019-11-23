@@ -98,8 +98,6 @@ class QLearning:
         
         q_values = {}
         
-        # Your code here
-        
         
         actions_json_file='/action_config.json'
 
@@ -111,27 +109,36 @@ class QLearning:
         
         
         
-        
+# =============================================================================
+#       episode parameters
+# =============================================================================
         episodes=300
         episode_update=5 #the amount of episodes a tbot will train while the other tbots policy remains constant. must be a divisor of episodes
-        
-        
+        episode_blocks=int(episodes/episode_update) #number of episode blocks, each episode block one tbot is updating their q table while the other only acts 
+# =============================================================================
+#       epsilon parameters & set penalty values 
+# =============================================================================
         epsilon_initial=.95
         epsilon_decay=.02
         epsilon_calc= lambda epsilon_initial,epsilon_decay,i: max(0.05, epsilon_initial - epsilon_decay*i) 
         
+        
         self.book_penalty=-100
         self.bump_penalty=-100
         
-        pdb.set_trace()
         
-        #q tables initialized to zero 
+# =============================================================================
+#         q tables initialized to zero 
+# =============================================================================
         q1=np.zeros((4,4,4,2,2,4,5)) #(x,y, orientation, c1,c2,tbot_near,action) #c1,c2 will be zero if available, and one if picked up 
         q2=np.zeros((4,4,4,2,2,4,5))
         
+# =============================================================================
+#       Create Agents
+# =============================================================================
+        
         agent1_books=[1]
         agent2_books=[2]
-        
         
         agent1=Agent('robot1',q1,agent1_books) 
         agent2=Agent('robot2',q2,agent2_books)
@@ -139,15 +146,18 @@ class QLearning:
         tbot_list=[agent1,agent2]
         
         
-        episode_block=int(episodes/episode_update)
+# =============================================================================
+#       acting and training 
+# =============================================================================
         
-        for i in range(episode_block):
-          epsilon=epsilon_calc(epsilon_initial,epsilon_decay,i)
+        for i in range(episode_blocks):
+          epsilon=epsilon_calc(epsilon_initial,epsilon_decay,i) #epsilon can only changes every episode block
           for tbot in tbot_list: #determines which tbot is learning, active updates table, passive does not
             tbot_active=tbot
             tbot_passive_set=set(tbot_list)-set([tbot])
             tbot_passive=tbot_passive_set.pop()
             for e in range(episode_update):#cycle through the episodes inside an episode block
+              # a single episode 
               api.reset_world()
               initial_state=api.get_current_state()
               current_state=initial_state
@@ -165,13 +175,9 @@ class QLearning:
                 #pick action for tbot_active
                 #choose either random or exploit, according to epsilon=epsilon_calc(epsilon_initial, epsilon_decay, i)
                 
+                action_A,action_items_A,action_params_A=self.choose_action(tbot_active,epsilon,current_state) #selects action
 
-                action_A,action_items_A,action_params_A=self.choose_action(tbot_active,epsilon,current_state)
-                
-                pdb.set_trace()
-                
-                
-                through_api,next_state,reward=self.reward_prune(current_state,state_active,state_passive,action_A,action_items_A,tbot_active,tbot_passive)
+                through_api,next_state,reward=self.reward_prune(current_state,state_active,state_passive,action_A,action_items_A,tbot_active,tbot_passive) #prunes by checking for invalid actions, in which case we don't run through environment_api 
                 
                 if through_api:
                   success,next_state=api.execute_action(action_A,action_params_A,tbot_active.name)
@@ -181,14 +187,11 @@ class QLearning:
                 
                 
                 #update q_values of tbot_active ONLY
-                pdb.set_trace()
                 
                 state_action_idx=tuple(state_active)+tuple(tbot_active.idx_to_action.index(action_A))
                 tbot_active.q[state_action_idx]=(1-self.alpha)*tbot_active.q[state_action_idx]+self.alpha*(reward+self.gamma*max(tbot_active.q[next_state_active]))
-                
-                
-                
-                current_state=next_state # udpate current state for other tbot
+
+                current_state=next_state # udpate current state so the other tbot knows the updated state before choosing an action etc.
                 
                 state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
                 state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #passive bots state tuple
@@ -210,12 +213,6 @@ class QLearning:
                 
                 state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
                 state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #passive bots state tuple
-        
-        
-        
-        
-        
-        
         
         
         
