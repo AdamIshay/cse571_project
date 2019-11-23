@@ -112,7 +112,7 @@ class QLearning:
 # =============================================================================
 #       episode parameters
 # =============================================================================
-        episodes=300
+        episodes=300 #there are actually 2*episodes episodes, since there are two tbots
         episode_update=5 #the amount of episodes a tbot will train while the other tbots policy remains constant. must be a divisor of episodes
         episode_blocks=int(episodes/episode_update) #number of episode blocks, each episode block one tbot is updating their q table while the other only acts 
 # =============================================================================
