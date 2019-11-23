@@ -49,7 +49,7 @@ class QLearning:
         with open(root_path + "/q_values.json", "w") as fout:
             json.dump(q_values, fout)
 
-    def reward_prune(self,current_state,state_active,state_passive,action,action_items,tbot,tbot_other):
+    def reward_prune(self,current_state,state_tbot,state_tbot_other,action,action_items,tbot,tbot_other):
         #function that chooses to prune invalid actions (with large negative reward and no state change) or go through the api 
         through_api=True
         next_state=None
@@ -66,8 +66,8 @@ class QLearning:
                 next_state=current_state.copy()
 
         if action=='moveF':
-            tbot_near=tbot.tbot_near(state_active,state_passive)
-            if tbot_near==state_active[2]: #if another tbot is in the same direction that tbot_active is facing
+            tbot_near=tbot.tbot_near(state_tbot,state_tbot_other)
+            if tbot_near==state_tbot[2]: #if another tbot is in the same direction that tbot_active is facing
                 reward=self.bump_penalty
                 through_api=False
                 next_state=current_state.copy()
@@ -153,13 +153,15 @@ class QLearning:
               current_state=initial_state
               
               state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
-              state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
+              state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #passive bots state tuple
               
               while not api.is_terminal_state(current_state):
                 
                 through_api=True # flag for going through API for an action, if False, then reward is given manually
 
-
+# =============================================================================
+#               active tbot acts and learns 
+# =============================================================================
                 #pick action for tbot_active
                 #choose either random or exploit, according to epsilon=epsilon_calc(epsilon_initial, epsilon_decay, i)
                 
@@ -189,21 +191,25 @@ class QLearning:
                 current_state=next_state # udpate current state for other tbot
                 
                 state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
-                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
+                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #passive bots state tuple
         
         
-        
+# =============================================================================
+#               passive tbot acts and does NOT learn
+# =============================================================================
                 action_P,action_items_P,action_params_P=self.choose_action(tbot_passive,epsilon,current_state)
         
-                through_api,next_state,reward=self.reward_prune(current_state,state_active,state_passive,action_A,action_items_A,tbot_active,tbot_passive) #reward won't be used 
+                through_api,next_state,reward=self.reward_prune(current_state,state_passive,state_active,action_P,action_items_P,tbot_passive,tbot_active) #reward won't be used 
                 
-        
+                if through_api:
+                  success,next_state=api.execute_action(action_P,action_params_P,tbot_passive.name)
+                  reward=api.get_reward(current_state,action_P,next_state)
         
         
                 current_state=next_state # udpate current state for active tbot
                 
                 state_active=tbot_active.dict_to_np_state(current_state,tbot_passive)  #active bots state tuple
-                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #pssive bots state tuple
+                state_passive=tbot_passive.dict_to_np_state(current_state,tbot_active) #passive bots state tuple
         
         
         
