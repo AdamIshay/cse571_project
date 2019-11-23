@@ -82,23 +82,3 @@ class Agent:
         else:
             return 4
             
-            
-        
-
-
-# =============================================================================
-# s={u'book_1': {u'placed': False, u'x': 0.75, u'y': 3.0},
-#  u'book_2': {u'placed': False, u'x': 0.75, u'y': 1.5},
-#  u'robot1': {u'orientation': u'EAST', u'x': 1.0, u'y': 1.0},
-#  u'robot2': {u'orientation': u'EAST', u'x': 1.0, u'y': 1.0}}
-#     
-# 
-# a=Agent('robot1',1,1,1)
-# a.dict_to_np(s,'robot2')
-# 
-# 
-# 
-# a=Agent('robot2',1,1,1)
-# a.dict_to_np(s,'robot1')
-# 
-# =============================================================================
