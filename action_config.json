@@ -2,7 +2,7 @@
     "pick": { 
         "function": "execute_pick",
         "params": ["book_name"],
-        "success_reward": 25,
+        "success_reward": 1000,
         "fail_reward": -25,
         "possibilities": {
             "pick": 0.85,
