@@ -10,7 +10,7 @@ import math
 import copy
 import json
 from collections import namedtuple
-
+import pdb
 class RobotActionsServer:
 
     def __init__(self, object_dict, root_path, random_seed=10):
@@ -97,6 +97,7 @@ class RobotActionsServer:
 
 
     def check_edge(self, x1, y1, x2, y2):
+        #pdb.set_trace()
         rospy.wait_for_service('check_is_edge')
         try:
             check_is_edge = rospy.ServiceProxy('check_is_edge',CheckEdge)
@@ -213,7 +214,7 @@ class RobotActionsServer:
         
         calling_params.append("'" + robot_name + "'")
         calling_params.append("'" + json.dumps(self.current_state) + "'")
-        calling_params.append('True')
+        calling_params.append('False')
         
         calling_function = "self.{}({})".format(self.action_config[chosen_action]['function'], ','.join(calling_params))
         print(calling_function)
@@ -264,7 +265,7 @@ class RobotActionsServer:
         return self.failure, next_state
 
 
-    def execute_pick(self, robot_name, book_name, current_state, simulation=False):
+    def execute_pick(self, book_name, robot_name, current_state, simulation=False): #I swapped order of book_name with robot_name
         current_state = json.loads(current_state)
         if robot_name=='robot1':
             robot_state = self.get_turtlebot1_location(current_state)
@@ -272,7 +273,7 @@ class RobotActionsServer:
             robot_state = self.get_turtlebot2_location(current_state)
 
         next_state = copy.deepcopy(current_state)
-
+        #pdb.set_trace()
         # Valid book and book isn't already placed
         if book_name in self.object_dict["books"] and not current_state[book_name]['placed']:
             # Robot is at the load location for the book
@@ -308,6 +309,7 @@ class RobotActionsServer:
 
 
     def execute_moveF(self, robot_name, current_state, simulation=False):
+        #pdb.set_trace()
         current_state = json.loads(current_state)
         if robot_name=='robot1':
             robot_state = self.get_turtlebot1_location(current_state)

@@ -52,8 +52,12 @@ class Agent:
         ry_other=self.pos_to_idx(d[other_bot.name]['y'])
         ro_other=self.o_to_idx[d[other_bot.name]['orientation']]
         
-        
-        
+        if c1x < 0 or c2x < 0 or c1y < 0 or c2y < 0:
+            pdb.set_trace()
+# =============================================================================
+#         if rx>=5 or ry>=5:
+#             pdb.set_trace()
+# =============================================================================
         
         tbot_near=self.tbot_near([rx,ry],[rx_other,ry_other])
         
