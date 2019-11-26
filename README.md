@@ -29,42 +29,42 @@ if running with 1 book for each tbot:
 	
 	if training: #REQUIRED FOR SIMULATION IMMEDIATELY BELOW
 
-		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 1
+		rosrun group_8 server.py -sub 1 -b 1 -s 32 -t 1
 
-		rosrun cse571_project qlearning.py -task 2 -episodes 450
+		rosrun group_8 qlearning.py -task 2 -episodes 450
 
 	if running simulation: #DOES NOT WORK UNLESS TRAINING IMMEDIATELY ABOVE WAS COMPLETED
 		#NOTE ON SIMULATION: SIMULATION USUALLY HALTS AFTER TAKING THE FIRST FEW STEPS OR AFTER COLLECTING THE FIRST BOOK
 		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 0
 
-		rosrun cse571_project move1_bot3.py --> for first bot
+		rosrun group_8 move1_bot3.py --> for first bot
 
-		rosrun cse571_project move2_bot3.py --> for second bot
+		rosrun group_8 move2_bot3.py --> for second bot
 		
-		roslaunch cse571_project maze.launch
+		roslaunch group_8 maze.launch
 
-		rosrun cse571_project qlearning.py -task 3 -episodes 0
+		rosrun group_8 qlearning.py -task 3 -episodes 0
 
 if running with 3 books for each tbot:
 	
 
 	if training: #REQUIRED FOR SIMULATION IMMEDIATELY BELOW
 
-		rosrun cse571_project server.py -sub 1 -b 3 -s 32 -t 1
+		rosrun group_8 server.py -sub 1 -b 3 -s 32 -t 1
 	
-		rosrun cse571_project qlearning.py -task 4 -episodes 450
+		rosrun group_8 qlearning.py -task 4 -episodes 450
 
 	if running simulation: #DOES NOT WORK UNLESS TRAINING IMMEDIATELY ABOVE WAS COMPLETED
 
-		rosrun cse571_project server.py -sub 1 -b 3 -s 32 -t 0
+		rosrun group_8 server.py -sub 1 -b 3 -s 32 -t 0
 
-		rosrun cse571_project move1_bot3.py --> for first bot
+		rosrun group_8 move1_bot3.py --> for first bot
 
-		rosrun cse571_project move2_bot3.py --> for second bot
+		rosrun group_8 move2_bot3.py --> for second bot
 		
-		roslaunch cse571_project maze.launch
+		roslaunch group_8 maze.launch
 
-		rosrun cse571_project qlearning.py -task 5 -episodes 0
+		rosrun group_8 qlearning.py -task 5 -episodes 0
 
 
 
