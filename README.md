@@ -12,11 +12,11 @@ Every command below this point should be run in a separate terminal. When you tr
 
 First run each of these commands to download the code and give permissions. If you are not downloading from Github then skip the following line.
 
-cd ~/catkin_ws/src && git clone https://github.com/AdamIshay/cse571_project.git
+cd ~/catkin_ws/src && git clone https://github.com/AdamIshay/group_8.git
 
-chmod u+x ~/catkin_ws/src/cse571_project/scripts/*.py
+chmod u+x ~/catkin_ws/src/group_8/scripts/*.py
 
-chmod u+x ~/catkin_ws/src/cse571_project/env_setup.sh && ~/catkin_ws/src/cse571_project/env_setup.sh
+chmod u+x ~/catkin_ws/src/group_8/env_setup.sh && ~/catkin_ws/src/cse571_project/env_setup.sh
 
 
 
