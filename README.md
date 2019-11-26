@@ -1,5 +1,6 @@
 # cse_571_team8
 
+#SIMULATION DOES NOT WORK IF TRAINING HAS NOT COMPLETED
 First we need to train the model by updating the Q tables, then we can run the simulation. 
 Every command below this point should be run in a separate terminal. When you train, the Q table of each tbot will be saved, as well as the cumulative reward, like in homework #3.
 
@@ -20,13 +21,13 @@ roscore
 if running with 1 book for each tbot:
 
 	
-	if training:
+	if training: #REQUIRED FOR SIMULATION
 
 		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 1
 
 		rosrun cse571_project qlearning.py -task 2 -episodes 450
 
-	if running simulation:
+	if running simulation: #DOES NOT WORK UNLESS TRAINING WAS COMPLETED
 
 		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 0
 
@@ -41,13 +42,13 @@ if running with 1 book for each tbot:
 if running with 3 books for each tbot:
 	
 
-	if training:
+	if training: #REQUIRED FOR SIMULATION
 
 		rosrun cse571_project server.py -sub 1 -b 3 -s 32 -t 1
 	
 		rosrun cse571_project qlearning.py -task 4 -episodes 450
 
-	if running simulation:
+	if running simulation: #DOES NOT WORK UNLESS TRAINING WAS COMPLETED
 
 		rosrun cse571_project server.py -sub 1 -b 3 -s 32 -t 0
 
