@@ -35,7 +35,7 @@ if running with 1 book for each tbot:
 
 	if running simulation: #DOES NOT WORK UNLESS TRAINING IMMEDIATELY ABOVE WAS COMPLETED
 		#NOTE ON SIMULATION: SIMULATION USUALLY HALTS AFTER TAKING THE FIRST FEW STEPS OR AFTER COLLECTING THE FIRST BOOK
-		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 0
+		rosrun group_8 server.py -sub 1 -b 1 -s 32 -t 0
 
 		rosrun group_8 move1_bot3.py --> for first bot
 
