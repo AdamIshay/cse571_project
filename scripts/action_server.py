@@ -13,7 +13,7 @@ from collections import namedtuple
 import pdb
 class RobotActionsServer:
 
-    def __init__(self, object_dict, root_path, random_seed=10):
+    def __init__(self, object_dict, root_path, random_seed=10, train = 1):
         self.object_dict = object_dict
         self.failure = -1
         self.success = 1
@@ -24,7 +24,9 @@ class RobotActionsServer:
 
         self.robot1_status_publisher = rospy.Publisher("robot1/status", String, queue_size=10)
         self.robot2_status_publisher = rospy.Publisher("robot2/status", String, queue_size=10)
-
+        
+        self.sim='False' if train else 'True'
+        #pdb.set_trace()
         self.random_seed = random_seed
         self.current_state = self.generate_init_state()
         self.action_config = self.load_action_config(root_path + '/action_config.json')
@@ -214,7 +216,7 @@ class RobotActionsServer:
         
         calling_params.append("'" + robot_name + "'")
         calling_params.append("'" + json.dumps(self.current_state) + "'")
-        calling_params.append('False')
+        calling_params.append(self.sim) #change to true or false if you want simulation or not
         
         calling_function = "self.{}({})".format(self.action_config[chosen_action]['function'], ','.join(calling_params))
         print(calling_function)
