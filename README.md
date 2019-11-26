@@ -24,7 +24,7 @@ if running with 1 book for each tbot:
 
 		rosrun cse571_project server.py -sub 1 -b 1 -s 32 -t 1
 
-		rosrun cse571_project qlearning.py -task 3 -episodes 450
+		rosrun cse571_project qlearning.py -task 2 -episodes 450
 
 	if running simulation:
 
@@ -36,7 +36,7 @@ if running with 1 book for each tbot:
 		
 		roslaunch cse571_project maze.launch
 
-		rosrun cse571_project qlearning.py -task 2 -episodes 0
+		rosrun cse571_project qlearning.py -task 3 -episodes 0
 
 if running with 3 books for each tbot:
 	
