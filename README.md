@@ -62,10 +62,3 @@ if running with 3 books for each tbot:
 
 
 
-rosrun cse571_project move1_bot3.py --> for first bot
-
-rosrun cse571_project move2_bot3.py --> for second bot
-
-roslaunch cse571_project maze.launch
-
-rosrun cse571_project qlearning.py -task 1 --> As of now, we tested in this.
