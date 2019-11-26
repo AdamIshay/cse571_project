@@ -40,7 +40,6 @@ if running with 1 book for each tbot:
 
 if running with 3 books for each tbot:
 	
-	rosrun cse571_project server.py -sub 1 -b 3 -s 32 -t 1
 
 	if training:
 
