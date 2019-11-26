@@ -10,7 +10,7 @@
 First we need to train the model by updating the Q tables, then we can run the simulation. 
 Every command below this point should be run in a separate terminal. When you train, the Q table of each tbot will be saved, as well as the cumulative reward, like in homework #3.
 
-First run each of these commands to download the code and give permissions. If you are not downloading from Github then skip the following line.
+To download the code and give permissions. If you are not downloading from Github then skip the following line.
 
 		cd ~/catkin_ws/src && git clone https://github.com/AdamIshay/group_8.git
 
@@ -19,9 +19,10 @@ First run each of these commands to download the code and give permissions. If y
 		chmod u+x ~/catkin_ws/src/group_8/env_setup.sh && ~/catkin_ws/src/group_8/env_setup.sh
 
 
-
+First:
 
 		roscore
+		
 if running with 1 book for each tbot:
 
 	
