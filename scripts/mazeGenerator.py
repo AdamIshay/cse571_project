@@ -5,6 +5,7 @@ import random
 import pprint
 import json
 import copy
+import pdb
 
 class Maze:
 
@@ -168,7 +169,7 @@ class Maze:
 			coords = []
 			while(count <= n_obstacles):
 				books["book_"+str(bookCounter)] = {}
-				x = self.myscale*np.random.randint(0, (self.grid_dimension+1)//2)
+				x = self.myscale*np.random.randint(0, (self.grid_dimension+1));#removed //2
 				y = self.myscale*np.random.randint(0, (self.grid_dimension+1))
 				flag = np.random.randint(0, 2)
 				if(flag == 0 and ((x+self.myscale) <= self.grid_dimension*self.myscale//2) and ((x, y, x+self.myscale, y) not in self.blocked_edges)):
