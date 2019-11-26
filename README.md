@@ -16,7 +16,7 @@ cd ~/catkin_ws/src && git clone https://github.com/AdamIshay/group_8.git
 
 chmod u+x ~/catkin_ws/src/group_8/scripts/*.py
 
-chmod u+x ~/catkin_ws/src/group_8/env_setup.sh && ~/catkin_ws/src/cse571_project/env_setup.sh
+chmod u+x ~/catkin_ws/src/group_8/env_setup.sh && ~/catkin_ws/src/group_8/env_setup.sh
 
 
 
