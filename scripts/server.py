@@ -10,6 +10,7 @@ from action_server import RobotActionsServer
 import pickle
 import copy
 import os
+import pdb
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 books = None
@@ -19,6 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-sub', help='for providing no. of subjects', metavar='5', action='store', dest='n_subjects', default=2, type=int)
 parser.add_argument('-b', help='for providing no. of books for each subject', metavar='5', action='store', dest='n_books', default=2, type=int)
 parser.add_argument('-s', help='for providing random seed', metavar='32', action='store', dest='seed', default=int(time.time()), type=int)
+parser.add_argument('-t', help='train or simulate',metavar='1',action='store',dest='train',default=1,type=int) # added
 parser.add_argument('-action_seed', help='for providing action selection random seed', metavar='32', action='store', dest='action_seed', default=int(time.time()), type=int)
 robot_action_server = None
 
@@ -70,7 +72,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	n_subjects = args.n_subjects
 	n_books = args.n_books
-	seed = args.seed
+	seed = args.seed;train=args.train
 	print "n_subjectes: ", n_subjects
 	print "n_books:", n_books
 	if n_subjects > 20:
@@ -88,5 +90,5 @@ if __name__ == "__main__":
 	mazeInfoCopy = copy.deepcopy(mazeInfo)
 	print "blocked_edges: ", mazeInfo.blocked_edges
 	rospy.init_node('server')
-	robot_action_server = RobotActionsServer(books, root_path, args.action_seed)
+	robot_action_server = RobotActionsServer(books, root_path, args.action_seed, train)
 	server()
