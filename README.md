@@ -20,10 +20,8 @@ First run each of these commands to download the code and give permissions. If y
 
 
 
+
 		roscore
-
-
-
 if running with 1 book for each tbot:
 
 	
