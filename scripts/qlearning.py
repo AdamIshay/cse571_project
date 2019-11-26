@@ -99,7 +99,7 @@ class QLearning:
         return action,action_items,action_params,action_string
     
     
-    def task3(self, episodes):
+    def task2(self, episodes):
         
         q_values = {}
         
@@ -247,7 +247,7 @@ class QLearning:
         
         return q_values
 
-    def task2(self, episodes):
+    def task3(self, episodes):
         '''for running the simulation after training'''
         q_values = {}
         # Your code here
